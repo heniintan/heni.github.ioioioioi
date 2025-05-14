@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Tebak Nama Buah</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #f9f7e8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #ff6b6b;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .game-intro {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .game-area {
+            display: none;
+        }
+        
+        .question-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .fruit-image {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            margin: 0 auto 20px;
+            display: block;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            background-color: #f5f5f5;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .option-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #ffd166;
+            color: #333;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .option-btn:hover {
+            background-color: #ffb347;
+            transform: translateY(-2px);
+        }
+        
+        .feedback {
+            text-align: center;
+            font-weight: bold;
+            min-height: 24px;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .correct {
+            color: #06d6a0;
+            background-color: #e8f9f3;
+        }
+        
+        .incorrect {
+            color: #ef476f;
+            background-color: #fde8ec;
+        }
+        
+        .next-btn, .start-btn {
+            display: block;
+            margin: 0 auto;
+            padding: 12px 30px;
+            background-color: #06d6a0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .next-btn:hover, .start-btn:hover {
+            background-color: #04a57a;
+            transform: translateY(-2px);
+        }
+        
+        .result-container {
+            display: none;
+            text-align: center;
+        }
+        
+        .score {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #118ab2;
+        }
+        
+        .restart-btn {
+            padding: 12px 30px;
+            background-color: #118ab2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .restart-btn:hover {
+            background-color: #0d6e8c;
+            transform: translateY(-2px);
+        }
+        
+        .progress {
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #666;
+        }
+        
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            .fruit-image {
+                width: 150px;
+                height: 150px;
+            }
+        }
+
+        /* Tambahan style untuk kontrol musik */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: white;
+            padding: 10px;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+        }
+        
+        .music-control img {
+            width: 30px;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TEBAK NAMA BUAH</h1>
+        
+        <div class="game-intro" id="intro">
+            <p>MARI BERMAIN TEBAK NAMA BUAH! </p>
+              <P> BERSAMA HENI-INTAN KUSUMA NINGRUM</p>
+            <p>Lihat gambar buah dan pilih jawaban yang benar dari pilihan yang tersedia.</p>
+            <button class="start-btn" id="startBtn">Yuk Kita Mulai!</button>
+        </div>
+        
+        <div class="game-area" id="gameArea">
+            <div class="progress" id="progress">Pertanyaan 1 dari 5</div>
+            
+            <div class="question-container">
+                <img class="fruit-image" id="fruitImage" src="" alt="Gambar buah">
+                <div id="questionText">Buah apakah ini?</div>
+            </div>
+            
+            <div class="options" id="optionsContainer">
+                <!-- Options will be inserted here by JavaScript -->
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <button class="next-btn" id="nextBtn" style="display: none;">Lanjut</button>
+        </div>
+        
+        <div class="result-container" id="resultContainer">
+            <h2>HASIL PERMAINAN</h2>
+            <div class="score" id="scoreResult">Anda menjawab benar 3 dari 5 pertanyaan</div>
+            <div id="resultMessage">Lumayan! Tingkatkan lagi pengetahuan buah Anda.</div>
+            <button class="restart-btn" id="restartBtn">Main Lagi</button>
+        </div>
+    </div>
+
+    <!-- Kontrol musik di pojok kanan bawah -->
+    <div class="music-control" id="musicControl">
+        <img src="https://cdn-icons-png.flaticon.com/512/3669/3669483.png" alt="Music control" id="musicIcon">
+    </div>
+
+    <!-- Audio elements -->
+    <audio id="backgroundMusic" loop>
+        <source src="c:\Users\indog\Downloads\cute-baby-baby-fun-happy-acoustic-335608.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="correctSound">
+        <source src="https://www.soundjay.com/buttons/sounds/button-09.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="wrongSound">
+        <source src="https://www.soundjay.com/buttons/sounds/button-10.mp3" type="audio/mpeg">
+    </audio>
+    
+    <audio id="clickSound">
+        <source src="https://www.soundjay.com/buttons/sounds/button-21.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Game data dengan 5 pertanyaan
+        const questions = [
+            {
+                image: "https://images.unsplash.com/photo-1557800636-894a64c1696f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                question: "Buah apakah ini?",
+                options: ["Jeruk", "Pisang", "Anggur", "Apel"],
+                answer: 0,
+                fruitName: "Jeruk"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                question: "Buah apakah ini?",
+                options: ["Alpukat", "Pisang", "Apel", "Manggis"],
+                answer: 1,
+                fruitName: "Pisang"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                question: "Buah apakah ini?",
+                options: ["melon", "Stroberi", "Apel", "Durian"],
+                answer: 2,
+                fruitName: "Apel"
+            },
+            {
+                image: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
+                question: "Buah apakah ini?",
+                options: ["Mangga", "melon", "nanas", "Jambu"],
+                answer: 2,
+                fruitName: "nanas"
+            }
+        ];
+
+        // DOM elements
+        const introElement = document.getElementById('intro');
+        const gameAreaElement = document.getElementById('gameArea');
+        const resultContainerElement = document.getElementById('resultContainer');
+        const startBtn = document.getElementById('startBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const fruitImage = document.getElementById('fruitImage');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const feedbackElement = document.getElementById('feedback');
+        const progressElement = document.getElementById('progress');
+        const scoreResultElement = document.getElementById('scoreResult');
+        const resultMessageElement = document.getElementById('resultMessage');
+        const musicControl = document.getElementById('musicControl');
+        const musicIcon = document.getElementById('musicIcon');
+
+        // Audio elements
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const correctSound = document.getElementById('correctSound');
+        const wrongSound = document.getElementById('wrongSound');
+        const clickSound = document.getElementById('clickSound');
+        
+        // Game variables
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let answerSelected = false;
+        let isMusicPlaying = false;
+
+        // Initialize game when DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set volume
+            backgroundMusic.volume = 0.3;
+            correctSound.volume = 0.5;
+            wrongSound.volume = 0.5;
+            clickSound.volume = 0.3;
+            
+            // Event listeners
+            startBtn.addEventListener('click', startGame);
+            nextBtn.addEventListener('click', nextQuestion);
+            restartBtn.addEventListener('click', restartGame);
+            musicControl.addEventListener('click', toggleBackgroundMusic);
+            
+            // Add click sound to all buttons
+            document.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Play click sound only if audio is allowed
+                    try {
+                        clickSound.currentTime = 0;
+                        clickSound.play().catch(e => {});
+                    } catch (e) {}
+                });
+            });
+        });
+
+        // Fungsi untuk memutar musik latar
+        function toggleBackgroundMusic() {
+            if (isMusicPlaying) {
+                backgroundMusic.pause();
+                musicIcon.src = "https://cdn-icons-png.flaticon.com/512/3669/3669483.png";
+            } else {
+                // Try to play music
+                backgroundMusic.play().then(() => {
+                    musicIcon.src = "https://cdn-icons-png.flaticon.com/512/7960/7960808.png";
+                    isMusicPlaying = true;
+                }).catch(error => {
+                    alert("Mohon izinkan pemutaran audio untuk pengalaman bermain yang lebih baik. Klik tombol 'Mulai' terlebih dahulu.");
+                });
+            }
+            isMusicPlaying = !isMusicPlaying;
+        }
+
+        function startGame() {
+            introElement.style.display = 'none';
+            gameAreaElement.style.display = 'block';
+            showQuestion();
+            
+            // Coba memulai musik jika belum dimulai
+            if (!isMusicPlaying) {
+                toggleBackgroundMusic();
+            }
+        }
+
+        function showQuestion() {
+            answerSelected = false;
+            selectedAnswer = null;
+            feedbackElement.textContent = '';
+            feedbackElement.className = 'feedback';
+            nextBtn.style.display = 'none';
+
+            const currentQuestion = questions[currentQuestionIndex];
+            fruitImage.src = currentQuestion.image;
+            fruitImage.alt = "Gambar " + currentQuestion.fruitName;
+            questionText.textContent = currentQuestion.question;
+            progressElement.textContent = `Pertanyaan ${currentQuestionIndex + 1} dari ${questions.length}`;
+
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+
+            // Acak urutan opsi jawaban
+            const shuffledOptions = [...currentQuestion.options];
+            for (let i = shuffledOptions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+            }
+
+            // Create new options
+            shuffledOptions.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.dataset.option = option;
+                button.addEventListener('click', function(e) {
+                    selectAnswer(e, currentQuestion);
+                });
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(e, currentQuestion) {
+            if (answerSelected) return;
+
+            // Play click sound
+            try {
+                clickSound.currentTime = 0;
+                clickSound.play().catch(e => {});
+            } catch (e) {}
+
+            const selectedButton = e.target;
+            const selectedOption = selectedButton.dataset.option;
+            selectedAnswer = selectedOption;
+            answerSelected = true;
+
+            // Disable all buttons
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(button => {
+                button.disabled = true;
+                button.style.opacity = '0.7';
+            });
+
+            // Highlight selected answer
+            selectedButton.style.transform = 'scale(1.05)';
+            selectedButton.style.boxShadow = '0 0 10px rgba(0,0,0,0.3)';
+
+            // Check answer
+            if (selectedOption === currentQuestion.options[currentQuestion.answer]) {
+                // Mainkan suara benar
+                try {
+                    correctSound.currentTime = 0;
+                    correctSound.play().catch(e => {});
+                } catch (e) {}
+                
+                feedbackElement.textContent = 'Benar! 🎉 Ini adalah buah ' + currentQuestion.fruitName;
+                feedbackElement.className = 'feedback correct';
+                selectedButton.style.backgroundColor = '#06d6a0';
+                score++;
+            } else {
+                // Mainkan suara salah
+                try {
+                    wrongSound.currentTime = 0;
+                    wrongSound.play().catch(e => {});
+                } catch (e) {}
+                
+                feedbackElement.textContent = 'Salah! 😢 Ini sebenarnya adalah buah ' + currentQuestion.fruitName;
+                feedbackElement.className = 'feedback incorrect';
+                selectedButton.style.backgroundColor = '#ef476f';
+                
+                // Highlight correct answer
+                buttons.forEach(button => {
+                    if (button.dataset.option === currentQuestion.options[currentQuestion.answer]) {
+                        button.style.backgroundColor = '#06d6a0';
+                    }
+                });
+            }
+
+            nextBtn.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            // Play click sound
+            try {
+                clickSound.currentTime = 0;
+                clickSound.play().catch(e => {});
+            } catch (e) {}
+
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            gameAreaElement.style.display = 'none';
+            resultContainerElement.style.display = 'block';
+            
+            scoreResultElement.textContent = `Anda menjawab benar ${score} dari ${questions.length} pertanyaan`;
+            
+            const percentage = (score / questions.length) * 100;
+            if (percentage === 100) {
+                resultMessageElement.textContent = 'SEMPURNA! Anda benar semua! 🏆';
+            } else if (percentage >= 70) {
+                resultMessageElement.textContent = 'Hebat! Anda sangat mengenal buah-buahan. 👍';
+            } else if (percentage >= 50) {
+                resultMessageElement.textContent = 'Lumayan! Tingkatkan lagi pengetahuan buah Anda. 😊';
+            } else {
+                resultMessageElement.textContent = 'Yah, coba lagi ya! Belajar lebih banyak tentang buah-buahan. 🤓';
+            }
+        }
+
+        function restartGame() {
+            // Play click sound
+            try {
+                clickSound.currentTime = 0;
+                clickSound.play().catch(e => {});
+            } catch (e) {}
+
+            currentQuestionIndex = 0;
+            score = 0;
+            resultContainerElement.style.display = 'none';
+            gameAreaElement.style.display = 'block';
+            showQuestion();
+        }
+    </script>
+</body>
+</html>
